@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1485855540 source:h:\c\polynom\linliste.c
+	"linliste.h"
+
+1485855560 h:\c\polynom\linliste.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1486464237 source:h:\c\polynom\main.c
+	<stdio.h>
+	<stdlib.h>
+	"linliste.h"
+

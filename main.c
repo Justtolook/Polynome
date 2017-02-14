@@ -2,7 +2,7 @@
 Name: Henrik Lammert
 Thema: Polynome mit Linearen Listen
 Datum: 31.01.2017
-Letzte Änderung: 07.02.2017
+Letzte Änderung: 14.02.2017
 */
 
 #include <stdio.h>
@@ -23,14 +23,12 @@ l_listtype eingabe() {
         scanf("%d", &iAgain);
         printf("\n");
     }while(iAgain==1);
-
+    l_reset(&lList);
     return(lList);
 }
 
-void ausgabe(l_listtype *lList) { //TODO: vollständige ausgabe
-    int iC;
-    int iL;
-    printf(">Ausgabe2<\n\n");
+void ausgabe(l_listtype *lList) { //verbessern?
+    printf(">Ausgabe<\n\n");
     l_reset(lList);
     printf("f(%c)=",lList->actual->ltcontent.cVar);
     do {
@@ -41,30 +39,46 @@ void ausgabe(l_listtype *lList) { //TODO: vollständige ausgabe
         l_next(lList);
 
     }while(l_end(*lList)!=1);
+    printf("%d%c^%d",lList->actual->ltcontent.iKoeff, lList->actual->ltcontent.cVar, lList->actual->ltcontent.iExpo);
+    if(l_end(*lList)!=1) {
+        printf("+");
+    }
     printf("\n\n");
     l_reset(lList);
 
 
 }
 
-void ableiten(l_listtype *lList) { //TODO: Ableitung in neue List speichern
-    l_listtype lListAbg;
+void ableiten(l_listtype *lList) {
+    l_listtype lListAbg= l_create();
 
+    l_reset(lList);
 
     do{
+        l_last(&lListAbg,l_create_newelement());
+    }while(l_end(*lList));
+
+    l_last(&lListAbg,l_create_newelement());
+
+    l_reset(lList);
+    l_reset(&lListAbg);
+    do{
         (lListAbg.actual->ltcontent.iKoeff)=(lList->actual->ltcontent.iKoeff) * (lList->actual->ltcontent.iExpo);
-        (lListAbg.actual->ltcontent.iExpo)=(lList->actual->ltcontent.iExpo)--;
+        (lListAbg.actual->ltcontent.iExpo)=(lList->actual->ltcontent.iExpo)-1;
         (lListAbg.actual->ltcontent.cVar)=(lList->actual->ltcontent.cVar);
+        l_next(&lListAbg);
         l_next(lList);
     }while(l_end(*lList)!=1);
     (lListAbg.actual->ltcontent.iKoeff)=(lList->actual->ltcontent.iKoeff) * (lList->actual->ltcontent.iExpo);
-    (lListAbg.actual->ltcontent.iExpo)=(lList->actual->ltcontent.iExpo)--;
+    (lListAbg.actual->ltcontent.iExpo)=(lList->actual->ltcontent.iExpo)-1;
     (lListAbg.actual->ltcontent.cVar)=(lList->actual->ltcontent.cVar);
 
     l_reset(lList);
+    l_reset(&lListAbg);
+    printf("f'(%c)=",lListAbg.actual->ltcontent.cVar);
     do{
         if((lListAbg.actual->ltcontent.iExpo)==0) {
-            printf("%d", lList->actual->ltcontent.iKoeff);
+            printf("%d", lListAbg.actual->ltcontent.iKoeff);
         }
         if((lListAbg.actual->ltcontent.iExpo)==-1) {
             printf(" ");
@@ -73,13 +87,14 @@ void ableiten(l_listtype *lList) { //TODO: Ableitung in neue List speichern
             printf("%d%c^%d",lListAbg.actual->ltcontent.iKoeff, lListAbg.actual->ltcontent.cVar, lListAbg.actual->ltcontent.iExpo);
         }
 
-        if(l_end(*lList)!=1 || ((lListAbg.actual->ltcontent.iExpo)!=-1)) {
+        if(l_end(lListAbg)!=1 || ((lListAbg.actual->ltcontent.iExpo)!=-1)) {
             printf("+");
         }
-        l_next(lList);
-    }while(l_end(*lList)!=1);
+        l_next(&lListAbg);
+    }while(l_end(lListAbg)!=1);
+
     if((lListAbg.actual->ltcontent.iExpo)==0) {
-            printf("%d", lList->actual->ltcontent.iKoeff);
+            printf("%d", lListAbg.actual->ltcontent.iKoeff);
     }
     if((lListAbg.actual->ltcontent.iExpo)==-1) {
         printf(" ");
@@ -88,69 +103,145 @@ void ableiten(l_listtype *lList) { //TODO: Ableitung in neue List speichern
             printf("%d%c^%d",lListAbg.actual->ltcontent.iKoeff, lListAbg.actual->ltcontent.cVar, lListAbg.actual->ltcontent.iExpo);
     }
 
-
-    printf("");
-
 }
 
-void division(l_listtype *lList) {
+void addition(l_listtype *lList) {
     l_listtype lList1 = l_create();
     l_listtype lList2 = l_create();
 
-    lList1=eingabe();
-    lList2=eingabe();
 
+    lList1=eingabe();
+    l_reset(&lList1);
+    ausgabe(&lList1);
+    l_reset(lList);
+    do{
+        if((lList->actual->ltcontent.iExpo) == (lList1.actual->ltcontent.iExpo) && (lList->actual->ltcontent.cVar) == (lList1.actual->ltcontent.cVar)) {
+            l_last(&lList2,l_create_newelement());
+            lList2.actual->ltcontent.cVar = lList->actual->ltcontent.cVar;
+            lList2.actual->ltcontent.iExpo = lList->actual->ltcontent.iExpo;
+            lList2.actual->ltcontent.iKoeff = lList->actual->ltcontent.iKoeff + lList1.actual->ltcontent.iKoeff;
+            l_next(&lList2);
+        }
+        else {
+            l_last(&lList2,l_create_newelement());
+            lList2.actual->ltcontent.cVar = lList->actual->ltcontent.cVar;
+            lList2.actual->ltcontent.iExpo = lList->actual->ltcontent.iExpo;
+            lList2.actual->ltcontent.iKoeff = lList->actual->ltcontent.iKoeff;
+            l_next(&lList2);
+            l_last(&lList2,l_create_newelement());
+            lList2.actual->ltcontent.cVar = lList1.actual->ltcontent.cVar;
+            lList2.actual->ltcontent.iExpo = lList1.actual->ltcontent.iExpo;
+            lList2.actual->ltcontent.iKoeff = lList1.actual->ltcontent.iKoeff;
+            l_next(&lList2);
+        }
+        l_next(lList);
+        l_next(&lList1);
+    }while(l_end(*lList)!=1);
+    if((lList->actual->ltcontent.iExpo) == (lList1.actual->ltcontent.iExpo) && (lList->actual->ltcontent.cVar) == (lList1.actual->ltcontent.cVar)) {
+        l_last(&lList2,l_create_newelement());
+        lList2.actual->ltcontent.cVar = lList->actual->ltcontent.cVar;
+        lList2.actual->ltcontent.iExpo = lList->actual->ltcontent.iExpo;
+        lList2.actual->ltcontent.iKoeff = lList->actual->ltcontent.iKoeff + lList1.actual->ltcontent.iKoeff;
+        l_next(&lList2);
+    }
+    else {
+        l_last(&lList2,l_create_newelement());
+        lList2.actual->ltcontent.cVar = lList->actual->ltcontent.cVar;
+        lList2.actual->ltcontent.iExpo = lList->actual->ltcontent.iExpo;
+        lList2.actual->ltcontent.iKoeff = lList->actual->ltcontent.iKoeff;
+        l_next(&lList2);
+        l_last(&lList2,l_create_newelement());
+        lList2.actual->ltcontent.cVar = lList1.actual->ltcontent.cVar;
+        lList2.actual->ltcontent.iExpo = lList1.actual->ltcontent.iExpo;
+        lList2.actual->ltcontent.iKoeff = lList1.actual->ltcontent.iKoeff;
+        l_next(&lList2);
+    }
+    l_reset(&lList2);
+    ausgabe(&lList2);
+}
+
+void subtrahieren(l_listtype *lList) {
+    l_listtype lList1 = l_create();
+    l_listtype lList2 = l_create();
+
+
+    lList1=eingabe();
+    l_reset(&lList1);
+    ausgabe(&lList1);
+    l_reset(lList);
+    do{
+        if((lList->actual->ltcontent.iExpo) == (lList1.actual->ltcontent.iExpo) && (lList->actual->ltcontent.cVar) == (lList1.actual->ltcontent.cVar)) {
+            l_last(&lList2,l_create_newelement());
+            lList2.actual->ltcontent.cVar = lList->actual->ltcontent.cVar;
+            lList2.actual->ltcontent.iExpo = lList->actual->ltcontent.iExpo;
+            lList2.actual->ltcontent.iKoeff = lList->actual->ltcontent.iKoeff - lList1.actual->ltcontent.iKoeff;
+            l_next(&lList2);
+        }
+        else {
+            l_last(&lList2,l_create_newelement());
+            lList2.actual->ltcontent.cVar = lList->actual->ltcontent.cVar;
+            lList2.actual->ltcontent.iExpo = lList->actual->ltcontent.iExpo;
+            lList2.actual->ltcontent.iKoeff = lList->actual->ltcontent.iKoeff;
+            l_next(&lList2);
+            l_last(&lList2,l_create_newelement());
+            lList2.actual->ltcontent.cVar = lList1.actual->ltcontent.cVar;
+            lList2.actual->ltcontent.iExpo = lList1.actual->ltcontent.iExpo;
+            lList2.actual->ltcontent.iKoeff = lList1.actual->ltcontent.iKoeff;
+            l_next(&lList2);
+        }
+        l_next(lList);
+        l_next(&lList1);
+    }while(l_end(*lList)!=1);
+    if((lList->actual->ltcontent.iExpo) == (lList1.actual->ltcontent.iExpo) && (lList->actual->ltcontent.cVar) == (lList1.actual->ltcontent.cVar)) {
+            l_last(&lList2,l_create_newelement());
+            lList2.actual->ltcontent.cVar = lList->actual->ltcontent.cVar;
+            lList2.actual->ltcontent.iExpo = lList->actual->ltcontent.iExpo;
+            lList2.actual->ltcontent.iKoeff = lList->actual->ltcontent.iKoeff + lList1.actual->ltcontent.iKoeff;
+            l_next(&lList2);
+        }
+        else {
+            l_last(&lList2,l_create_newelement());
+            lList2.actual->ltcontent.cVar = lList->actual->ltcontent.cVar;
+            lList2.actual->ltcontent.iExpo = lList->actual->ltcontent.iExpo;
+            lList2.actual->ltcontent.iKoeff = lList->actual->ltcontent.iKoeff;
+            l_next(&lList2);
+            l_last(&lList2,l_create_newelement());
+            lList2.actual->ltcontent.cVar = lList1.actual->ltcontent.cVar;
+            lList2.actual->ltcontent.iExpo = lList1.actual->ltcontent.iExpo;
+            lList2.actual->ltcontent.iKoeff = lList1.actual->ltcontent.iKoeff;
+            l_next(&lList2);
+        }
+    l_reset(&lList2);
+    ausgabe(&lList2);
 }
 
 
 int main()
 {
-    int iAgain=0;
-    int iC=0;
-    int iL;
     int iOption=0;
     l_listtype lList = l_create();
 
     printf(">>>Polynome<<<\n");
-    /*
-    printf("Bitte geben Sie ihr Polynom ein.\n");
-    do
-    {
-        l_last(&lList,l_create_newelement());
-        l_setcontent(&lList);
-        printf("Moechten Sie noch ein Summand eingeben?\n Ja -> 1\n Nein -> 0\n");
-        scanf("%d", &iAgain);
-        printf("\n");
-        iC++;
-    }while(iAgain==1);
-    */
+    printf("ACHTUNG: Bitte geben sie die Summanden vom großen bis kleinen Exponenten ein!\n");
+
 
     lList=eingabe();
     ausgabe(&lList);
 
-    printf("\n\n");
-
-    printf(">Ausgabe<\n\n");
-    l_reset(&lList);
-    printf("f(%c)=",lList.actual->ltcontent.cVar);
-    for(iL=0;iL<iC;iL++) {
-        printf("%d%c^%d",lList.actual->ltcontent.iKoeff, lList.actual->ltcontent.cVar, lList.actual->ltcontent.iExpo);
-        if(l_end(lList)!=1) {
-            printf("+");
-        }
-        l_next(&lList);
-    }
     printf("\n\n");
     l_reset(&lList);
 
 
     printf("Was moechten Sie machen?\n");
     printf("1 Ableiten\n");
-    printf("2 Polynomdivision\n");
+    printf("2 Polynome addieren\n");
+    printf("3 Polynome subtrahieren\n");
     scanf("%d", &iOption);
 
     switch(iOption) {
-    case 1: ableiten(&lList);
+    case 1: ableiten(&lList);break;
+    case 2: addition(&lList);break;
+    case 3: subtrahieren(&lList);break;
     }
 
 

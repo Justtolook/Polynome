@@ -12,3 +12,16 @@
 	<stdlib.h>
 	"linliste.h"
 
+1487045376 source:c:\users\henrik\documents\c\polynome-master\linliste.c
+	"linliste.h"
+
+1487045376 c:\users\henrik\documents\c\polynome-master\linliste.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1487622370 source:c:\users\henrik\documents\c\polynome-master\main.c
+	<stdio.h>
+	<stdlib.h>
+	"linliste.h"
+
